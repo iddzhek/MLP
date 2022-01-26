@@ -4,6 +4,8 @@ import java.io.IOException;
 
 public class MLP {
 
+    DataSet dataSet = new DataSet();
+
     double[] input;
     double[] hidden;
     double outer;
@@ -14,14 +16,15 @@ public class MLP {
 //    };
 //    double[] answer = {0, 0, 1, 0};
 
-    Integer[][] patterns = DataSet.getTokenizedDataStudy();
-    Integer[] answer = DataSet.getTokenizedAnswerData();
+    Double[][] patterns = dataSet.getStudyData();
+    Double[] answer = dataSet.getStudyAnswers();
 
-    Integer[][] training = DataSet.getTokenizedDataTraining();
+    Double[][] training = dataSet.getTrainData();
+    Double[] answerTrain = dataSet.getTrainAnswers();
 
-    public MLP(){
+    public MLP() throws IOException {
         input = new double[patterns[0].length];
-        hidden = new double[100];
+        hidden = new double[(patterns.length/3)*2];
         wInputHidden = new double[input.length][hidden.length];
         wHiddenOuter = new double[hidden.length];
 
@@ -34,11 +37,14 @@ public class MLP {
             for (int i = 0; i < input.length; i++) {
                 input[i] = training[p][i];
             }
-            if (outer > 0.51)
-                outer = 1;
-            else outer = 0;
-            if(answer[p+2726] == outer)
+            countOuter();
+//            if (outer > 0.51)
+//                outer = 1;
+//            else outer = 0;
+            if(answerTrain[p] == outer)
                 s++;
+            System.out.println(outer + "; answer: " +answerTrain[p]);
+
 
 //        for(int p = 0; p < training.length; p++) {
 //            if(answer[p] == outer)
@@ -46,8 +52,6 @@ public class MLP {
 //            for (int i = 0; i < input.length; i++) {
 //                input[i] = patterns[p][i];
 //            }
-
-            countOuter();
 
 //            System.out.println(outer);
         }
@@ -57,11 +61,12 @@ public class MLP {
     public void initializationWeight(){
         for (int i = 0; i < wInputHidden.length; i++){
             for (int j = 0; j < wInputHidden[i].length; j++){
-                wInputHidden[i][j] = Math.random() * 1 - 0.5;
+                wInputHidden[i][j] = Math.random() * 0.5;
             }
         }
+//        System.out.println("1");
         for (int i = 0; i < wHiddenOuter.length; i++){
-            wHiddenOuter[i] = Math.random() * 1 - 0.5;
+            wHiddenOuter[i] = Math.random() * 0.5;
         }
     }
 
@@ -121,7 +126,7 @@ public class MLP {
 
 //                double lError = answer[p] - outer;
 //                double lError = outer - answer[p];
-                gError += (Math.pow((outer - answer[p]), 2))/training.length;
+                gError += ((Math.pow((answer[p] - outer), 2))/training.length);
 
 //                for (int i = 0; i < hidden.length; i++){
 //                    err[i] = lError * wHiddenOuter[i];
@@ -148,25 +153,27 @@ public class MLP {
 
             for(int p = 0; p < patterns.length; p++){
                 for (int i = 0; i < hidden.length; i++){
-                    wHiddenOuter[i] += 0.1 * errOH * hidden[i]; //корр весов на выходном 39
+                    wHiddenOuter[i] += 0.1 * errOH * hidden[i];
                 }
 
                 for(int i = 0; i < input.length; i++){
                     for (int j = 0; j < hidden.length; j++){
-                        wInputHidden[i][j] += 0.1 * teta * input[i]; //обуч коэф * знач ошибки скрытом слое * н  а значение входного нейрона
+                        wInputHidden[i][j] += 0.1 * teta * input[i];
                     }
                 }
             }
             count++;
+//            gError = gError * 0.5;
 //            System.out.println(count);
+            System.out.println("gError = " + teta);
         }
         while (count !=500);
-        System.out.println("gError = " + gError);
+        System.out.println("gError = " + teta);
         System.out.println("Epochs = " + count);
     }
 
     public static void main(String[] args) throws IOException {
-        DataSet dataSet = new DataSet();
+//        DataSet dataSet = new DataSet();
 //        dataSet.readCSV();
 //        dataSet.createTokenWord();
 //        dataSet.creteBeforeTokenizedData();
