@@ -9,7 +9,7 @@ import java.util.Map;
 public class DataSet {
 
     int num_words = 10000; //максимальное количество слов;
-    static int max_news_len = 150; //максимальная длина новости;
+    static int max_news_len = 100; //максимальная длина новости;
     int nb_classes = 2; //количество классов новостей;
     int count;
 
